@@ -1,0 +1,134 @@
+{
+  "project_info": {
+    "project_number": "945771911357",
+    "project_id": "hospitalitynewsapp-f7968",
+    "storage_bucket": "hospitalitynewsapp-f7968.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:945771911357:android:2c9e635515d5ab6a773fd4",
+        "android_client_info": {
+          "package_name": "com.guestezee"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "945771911357-7th9km48fke7ho9nhbmjr01m8o8h6kmv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxpF6fFUrntXtkKwkjIW8hLana-UVvih4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "945771911357-7th9km48fke7ho9nhbmjr01m8o8h6kmv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "945771911357-ipl07223mgbvjan4mcat4lev3jkq034g.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.guestezee.staff"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:945771911357:android:bd81263d8355f20c773fd4",
+        "android_client_info": {
+          "package_name": "com.guestezee.staff"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "945771911357-7th9km48fke7ho9nhbmjr01m8o8h6kmv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxpF6fFUrntXtkKwkjIW8hLana-UVvih4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "945771911357-7th9km48fke7ho9nhbmjr01m8o8h6kmv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "945771911357-ipl07223mgbvjan4mcat4lev3jkq034g.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.guestezee.staff"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:945771911357:android:1c1c2b55957fa3a6773fd4",
+        "android_client_info": {
+          "package_name": "com.guestventoapp.hospitalitynewsapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "945771911357-011iqnmq1n7arl9el3s302ps8tvochhs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.guestventoapp.hospitalitynewsapp",
+            "certificate_hash": "49030e66a75276311af0523b3194641ee1ff86b1"
+          }
+        },
+        {
+          "client_id": "945771911357-74v5unpo5vr75me09cgusj3ol8q808q7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.guestventoapp.hospitalitynewsapp",
+            "certificate_hash": "1c8569ba50ac4b598e1834d22953132bb8ede6f5"
+          }
+        },
+        {
+          "client_id": "945771911357-7th9km48fke7ho9nhbmjr01m8o8h6kmv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxpF6fFUrntXtkKwkjIW8hLana-UVvih4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "945771911357-7th9km48fke7ho9nhbmjr01m8o8h6kmv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "945771911357-ipl07223mgbvjan4mcat4lev3jkq034g.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.guestezee.staff"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
