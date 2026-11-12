@@ -9,6 +9,7 @@ import 'package:guestezee_staffs_app/Services/local_storage_service.dart';
 import 'package:guestezee_staffs_app/Services/network_error_message.dart';
 import 'package:guestezee_staffs_app/Services/escalation_timer_service.dart';
 import 'package:guestezee_staffs_app/Custom%20Widgets/fnb_order_details.dart';
+import 'package:guestezee_staffs_app/Custom%20Widgets/service_task_icon.dart';
 import 'package:guestezee_staffs_app/Custom%20Widgets/task_special_request.dart';
 import 'package:guestezee_staffs_app/Custom%20Widgets/desk_task_floating_actions.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -708,28 +709,10 @@ class _ScheduledTaskPageState extends ConsumerState<ScheduledTaskPage> {
                                                                       screenWidth *
                                                                           0.35,
                                                                 ),
-                                                                child: Text(
-                                                                  LocalStorageService
-                                                                      .hotelName,
-                                                                  maxLines: 2,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Theme.of(
-                                                                            context)
-                                                                        .colorScheme
-                                                                        .primary,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w700,
-                                                                    fontSize:
-                                                                        18,
-                                                                  ),
+                                                                child: ServiceTaskIcon(
+                                                                  task: tasks[
+                                                                      index],
+                                                                  size: 56,
                                                                 ),
                                                               ),
                                                             ),

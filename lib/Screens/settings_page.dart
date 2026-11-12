@@ -12,7 +12,6 @@ import 'package:guestezee_staffs_app/Services/local_storage_service.dart';
 import 'package:guestezee_staffs_app/Services/staff_service.dart';
 import 'package:guestezee_staffs_app/Services/staff_presence_service.dart';
 import 'package:guestezee_staffs_app/Screens/registration_page.dart';
-import 'package:guestezee_staffs_app/Services/notification_settings_service.dart';
 import 'package:guestezee_staffs_app/Services/push_notification_service.dart';
 import 'package:guestezee_staffs_app/Screens/static_content_page.dart';
 import 'package:hive/hive.dart';
@@ -842,7 +841,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
     // Handle notification settings after setState
     if (index == 1) {
-      await NotificationSettingsService.showNotificationSettingsDialog(context);
+      await PushNotificationService.handleNotificationEnableTap(context);
     }
   }
 

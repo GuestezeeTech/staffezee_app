@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:guestezee_staffs_app/Custom%20Widgets/navigation_page.dart';
+import 'package:guestezee_staffs_app/Custom%20Widgets/notification_permission_bottom_sheet.dart';
 import 'package:guestezee_staffs_app/Custom%20Widgets/hotel_status_gate.dart';
 import 'package:guestezee_staffs_app/Screens/login_page.dart';
 import 'package:guestezee_staffs_app/Screens/escalated_tasks_page.dart';
@@ -106,6 +107,9 @@ void main() async {
   // When user is already logged in, refresh FCM token with backend (add to array or update availability)
   WidgetsBinding.instance.addPostFrameCallback((_) {
     PushNotificationService.refreshFcmTokenWithBackendIfLoggedIn();
+    if (LocalStorageService.rememberMe && LocalStorageService.isLoggedIn) {
+      scheduleNotificationPromptAfterLogin();
+    }
   });
 
   // Initialize continuous sound service

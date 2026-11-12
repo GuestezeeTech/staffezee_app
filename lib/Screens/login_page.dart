@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:guestezee_staffs_app/Custom%20Widgets/navigation_page.dart';
+import 'package:guestezee_staffs_app/Custom%20Widgets/notification_permission_bottom_sheet.dart';
 import 'package:guestezee_staffs_app/Screens/escalated_tasks_page.dart';
 import 'package:guestezee_staffs_app/Screens/registration_page.dart';
 import 'package:guestezee_staffs_app/Screens/static_content_page.dart';
@@ -614,6 +615,7 @@ class _LoginPageState extends State<LoginPage> {
           }
 
           PushNotificationService.handlePostLoginNavigation();
+          scheduleNotificationPromptAfterLogin();
         } else {
           _showError('Invalid credentials');
         }

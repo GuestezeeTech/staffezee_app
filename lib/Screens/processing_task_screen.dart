@@ -10,6 +10,7 @@ import 'package:guestezee_staffs_app/Services/network_error_message.dart';
 import 'package:guestezee_staffs_app/Services/escalation_timer_service.dart';
 import 'package:guestezee_staffs_app/Custom%20Widgets/navigation_page.dart';
 import 'package:guestezee_staffs_app/Custom%20Widgets/fnb_order_details.dart';
+import 'package:guestezee_staffs_app/Custom%20Widgets/service_task_icon.dart';
 import 'package:guestezee_staffs_app/Custom%20Widgets/task_special_request.dart';
 import 'package:guestezee_staffs_app/Custom%20Widgets/task_card_type.dart';
 import 'package:guestezee_staffs_app/Custom%20Widgets/task_transition_loader.dart';
@@ -508,19 +509,7 @@ class _ProcessingTaskPageState extends ConsumerState<ProcessingTaskPage>
                                       maxWidth:
                                           MediaQuery.of(context).size.width * 0.4,
                                     ),
-                                    child: Text(
-                                      LocalStorageService.hotelName,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 14,
-                                      ),
-                                    ),
+                                    child: ServiceTaskIcon(task: task),
                                   ),
                                 ),
                               ),

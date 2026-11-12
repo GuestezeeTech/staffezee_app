@@ -9,11 +9,10 @@ import 'package:guestezee_staffs_app/Services/staff_service.dart';
 import 'package:guestezee_staffs_app/const.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:guestezee_staffs_app/Custom Widgets/fnb_order_details.dart';
+import 'package:guestezee_staffs_app/Custom Widgets/service_task_icon.dart';
 import 'package:guestezee_staffs_app/Custom Widgets/task_special_request.dart';
 import 'package:guestezee_staffs_app/Screens/login_page.dart';
 import 'package:guestezee_staffs_app/Screens/high_priority_tasks_page.dart';
-import 'package:guestezee_staffs_app/Screens/settings_page.dart';
-import 'package:guestezee_staffs_app/Services/notification_settings_service.dart';
 import 'package:guestezee_staffs_app/Screens/track_task_page.dart';
 import 'package:guestezee_staffs_app/Services/push_notification_service.dart';
 import 'package:guestezee_staffs_app/Services/high_priority_badge_service.dart';
@@ -305,19 +304,7 @@ class _EscalatedTasksPageState extends State<EscalatedTasksPage>
                                     constraints: BoxConstraints(
                                       maxWidth: screenSize.width * 0.4,
                                     ),
-                                    child: Text(
-                                      LocalStorageService.hotelName,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: Theme.of(dialogContext)
-                                            .colorScheme
-                                            .primary,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 14,
-                                      ),
-                                    ),
+                                    child: ServiceTaskIcon(task: task),
                                   ),
                                 ),
                               ),
@@ -603,37 +590,8 @@ class _EscalatedTasksPageState extends State<EscalatedTasksPage>
 
   Future<void> _handleNotificationButtonTap() async {
     try {
-      bool areNotificationsEnabled =
-          await NotificationSettingsService.areNotificationsEnabled();
-
-      if (areNotificationsEnabled) {
-        // Show snackbar if notifications are already enabled
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  Icon(Icons.notifications_active, color: Colors.white),
-                  SizedBox(width: 8),
-                  Text('Notifications are already enabled'),
-                ],
-              ),
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 3),
-            ),
-          );
-        }
-      } else {
-        // Navigate to settings page for notification settings
-        if (mounted) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const SettingsPage(),
-            ),
-          );
-        }
-      }
+      if (!mounted) return;
+      await PushNotificationService.handleNotificationEnableTap(context);
     } catch (e) {
       print('❌ Error handling notification button: $e');
       if (mounted) {

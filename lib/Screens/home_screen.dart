@@ -18,6 +18,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:guestezee_staffs_app/Custom Widgets/navigation_page.dart';
 import 'package:guestezee_staffs_app/Custom Widgets/fnb_order_details.dart';
+import 'package:guestezee_staffs_app/Custom Widgets/service_task_icon.dart';
 import 'package:guestezee_staffs_app/Custom Widgets/task_special_request.dart';
 import 'package:guestezee_staffs_app/Custom Widgets/task_transition_loader.dart';
 import 'package:guestezee_staffs_app/Screens/track_task_page.dart';
@@ -542,19 +543,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                       maxWidth:
                                           MediaQuery.of(context).size.width * 0.4,
                                     ),
-                                    child: Text(
-                                      _displayHotelName,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 14,
-                                      ),
-                                    ),
+                                    child: ServiceTaskIcon(task: task),
                                   ),
                                 ),
                               ),

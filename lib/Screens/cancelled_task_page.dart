@@ -6,6 +6,7 @@ import 'package:guestezee_staffs_app/Services/task_service.dart';
 import 'package:guestezee_staffs_app/Services/local_storage_service.dart';
 import 'package:guestezee_staffs_app/Services/network_error_message.dart';
 import 'package:guestezee_staffs_app/Custom%20Widgets/fnb_order_details.dart';
+import 'package:guestezee_staffs_app/Custom%20Widgets/service_task_icon.dart';
 import 'package:guestezee_staffs_app/Custom%20Widgets/task_special_request.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -15,6 +16,8 @@ class CancelledTaskPage extends StatefulWidget {
   @override
   State<CancelledTaskPage> createState() => _CancelledTaskPageState();
 }
+// ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPKMMizf6jtwyKrxbMxpA8A/UXBRiCx2MDg6l8r9KLDV techteam@hospitalitynews.in
+// ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAa0Z3GX47KD+boojy9pUcOsJjKFFMw7pkwCs99Zk2SE info.hospitalitynews@gmail.com
 
 class _CancelledTaskPageState extends State<CancelledTaskPage> {
   // API data
@@ -156,19 +159,7 @@ class _CancelledTaskPageState extends State<CancelledTaskPage> {
                                           MediaQuery.of(context).size.width *
                                               0.4,
                                     ),
-                                    child: Text(
-                                      LocalStorageService.hotelName,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 14,
-                                      ),
-                                    ),
+                                    child: ServiceTaskIcon(task: task),
                                   ),
                                 ),
                               ),

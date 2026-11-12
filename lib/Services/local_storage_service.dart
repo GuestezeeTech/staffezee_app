@@ -17,6 +17,11 @@ class LocalStorageService {
   static const String pendingNotificationTapKey =
       'pending_notification_tap_after_login';
 
+  static const String _notificationModalResponseKey =
+      'notification_modal_response';
+  static const String _notificationOsDeniedAfterModalKey =
+      'notification_os_denied_after_modal';
+
   /// Initialize Hive (safe to call multiple times)
   static Future<void> init() async {
     if (!Hive.isAdapterRegistered(0)) {
@@ -76,11 +81,48 @@ class LocalStorageService {
 
   static Future<void> logout() async {
     await init();
+    final modalResponse = getNotificationModalResponse();
+    final osDenied = getNotificationOsDeniedAfterModal();
     await _syncLoggedInPref(false);
     await _authBox.clear();
     await _authBox.put('isLoggedIn', false);
+    if (modalResponse != null) {
+      await setNotificationModalResponse(modalResponse);
+    }
+    if (osDenied) {
+      await setNotificationOsDeniedAfterModal(true);
+    }
     HighPriorityBadgeService.reset();
-  } // Store app version
+  }
+
+  static String? getNotificationModalResponse() {
+    final raw =
+        _authBox.get(_notificationModalResponseKey)?.toString().trim();
+    if (raw == null || raw.isEmpty) return null;
+    return raw;
+  }
+
+  static Future<void> setNotificationModalResponse(String value) async {
+    await init();
+    await _authBox.put(_notificationModalResponseKey, value.trim());
+  }
+
+  static bool getNotificationOsDeniedAfterModal() {
+    return _authBox.get(_notificationOsDeniedAfterModalKey,
+            defaultValue: false) ==
+        true;
+  }
+
+  static Future<void> setNotificationOsDeniedAfterModal(bool value) async {
+    await init();
+    await _authBox.put(_notificationOsDeniedAfterModalKey, value);
+  }
+
+  static Future<void> clearNotificationPermissionPromptState() async {
+    await init();
+    await _authBox.delete(_notificationModalResponseKey);
+    await _authBox.delete(_notificationOsDeniedAfterModalKey);
+  }
 
   /// Persist notification tap payload (survives logout until login consumes it).
   static Future<void> savePendingNotificationTap(

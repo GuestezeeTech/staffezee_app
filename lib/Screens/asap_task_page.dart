@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:guestezee_staffs_app/const.dart';
 import 'package:guestezee_staffs_app/Custom%20Widgets/fnb_order_details.dart';
+import 'package:guestezee_staffs_app/Custom%20Widgets/service_task_icon.dart';
 import 'package:guestezee_staffs_app/Custom%20Widgets/task_special_request.dart';
 import 'package:guestezee_staffs_app/Screens/track_task_page.dart';
 import 'package:guestezee_staffs_app/Services/customer_service.dart';
@@ -383,13 +384,22 @@ class _AsapTaskPageState extends State<AsapTaskPage>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            task['service']?['service_name']?.toString() ??
-                                'Service',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          Row(
+                            children: [
+                              ServiceTaskIcon(task: task, size: 48),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  task['service']?['service_name']
+                                          ?.toString() ??
+                                      'Service',
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           if (escalated) ...[
                             const SizedBox(height: 8),

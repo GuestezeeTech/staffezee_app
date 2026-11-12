@@ -6,6 +6,7 @@ import 'package:guestezee_staffs_app/Services/local_storage_service.dart';
 import 'package:guestezee_staffs_app/Services/network_error_message.dart';
 import 'package:guestezee_staffs_app/Custom Widgets/task_special_request.dart';
 import 'package:guestezee_staffs_app/Custom Widgets/fnb_order_details.dart';
+import 'package:guestezee_staffs_app/Custom Widgets/service_task_icon.dart';
 import 'package:guestezee_staffs_app/Custom Widgets/task_card_type.dart';
 import 'package:guestezee_staffs_app/Screens/track_task_page.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -225,6 +226,7 @@ class _HighPriorityTasksPageState extends State<HighPriorityTasksPage> {
                           // Service Info
                           _buildInfoRow(
                             icon: Icons.dining,
+                            leading: ServiceTaskIcon(task: task, size: 28),
                             label: 'Service',
                             value:
                                 task['service']?['service_name']?.toString() ??
@@ -378,6 +380,7 @@ class _HighPriorityTasksPageState extends State<HighPriorityTasksPage> {
 
   Widget _buildInfoRow({
     required IconData icon,
+    Widget? leading,
     required String label,
     required String value,
     Color? valueColor,
@@ -385,7 +388,7 @@ class _HighPriorityTasksPageState extends State<HighPriorityTasksPage> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 20, color: Colors.grey[600]),
+        leading ?? Icon(icon, size: 20, color: Colors.grey[600]),
         SizedBox(width: 12),
         Expanded(
           child: Column(

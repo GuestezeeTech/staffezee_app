@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:guestezee_staffs_app/Custom%20Widgets/service_task_icon.dart';
 import 'package:guestezee_staffs_app/Custom%20Widgets/task_card_type.dart';
 
 /// Food order details — only when [task.service.belongs_to] is Menu Ordering.
@@ -108,6 +109,8 @@ class MenuOrderFoodSection extends StatelessWidget {
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              OrderItemImage(item: item),
+                              const SizedBox(width: 10),
                               Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(

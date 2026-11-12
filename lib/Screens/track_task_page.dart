@@ -12,6 +12,7 @@ import 'package:guestezee_staffs_app/Services/continuous_sound_service.dart';
 import 'package:guestezee_staffs_app/Services/Notifictaion%20service/alarm_service.dart';
 import 'package:guestezee_staffs_app/Custom Widgets/task_transition_loader.dart';
 import 'package:guestezee_staffs_app/Custom Widgets/fnb_order_details.dart';
+import 'package:guestezee_staffs_app/Custom Widgets/service_task_icon.dart';
 import 'package:guestezee_staffs_app/Custom Widgets/task_card_type.dart';
 import 'package:guestezee_staffs_app/Custom Widgets/task_special_request.dart';
 import 'package:guestezee_staffs_app/Custom Widgets/navigation_page.dart';
@@ -516,6 +517,10 @@ class _TrackTaskPageState extends State<TrackTaskPage>
                                     Divider(height: 24),
                                     _buildInfoRow(
                                       icon: Icons.dining,
+                                      leading: ServiceTaskIcon(
+                                        task: task!,
+                                        size: 28,
+                                      ),
                                       label: 'Service',
                                       value: task!['service']?['service_name']
                                               ?.toString() ??
@@ -866,13 +871,14 @@ class _TrackTaskPageState extends State<TrackTaskPage>
 
   Widget _buildInfoRow({
     required IconData icon,
+    Widget? leading,
     required String label,
     required String value,
   }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 20, color: Colors.grey[600]),
+        leading ?? Icon(icon, size: 20, color: Colors.grey[600]),
         SizedBox(width: 12),
         Expanded(
           child: Column(

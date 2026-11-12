@@ -18,6 +18,7 @@ import 'package:guestezee_staffs_app/Services/local_storage_service.dart';
 import 'package:guestezee_staffs_app/Services/audio_service.dart';
 import 'package:guestezee_staffs_app/Services/continuous_sound_service.dart';
 import 'package:guestezee_staffs_app/Services/Notifictaion%20service/alarm_service.dart';
+import 'package:guestezee_staffs_app/Services/notification_settings_launcher.dart';
 import 'package:guestezee_staffs_app/Services/staff_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,13 +33,15 @@ class PushNotificationService {
 
   static Map<String, dynamic>? _lastForegroundMessageData;
   static GlobalKey<NavigatorState>? _navigatorKey;
+  static BuildContext? get promptContext => _navigatorKey?.currentContext;
+
+  static bool _notificationGranted = false;
+  static AuthorizationStatus _notificationStatus =
+      AuthorizationStatus.notDetermined;
   static bool _isNavigatingFromNotification = false;
 
   // Store pending notification data for navigation after login
   static Map<String, dynamic>? _pendingNotificationData;
-
-  /// True when Android notification permission was permanently denied (user must open Settings).
-  static bool _androidNotificationPermanentlyDenied = false;
 
   /// Initialize the push notification service
   static Future<void> initialize(GlobalKey<NavigatorState> navigatorKey) async {
@@ -51,8 +54,8 @@ class PushNotificationService {
     await AudioService.initialize();
     await AlarmService.initialize();
 
-    // STEP 2: Request Permissions
-    await _requestPermissions();
+    // Permission is requested only after the post-login sheet, not at startup.
+    await _logNotificationPermissionStatus();
 
     // STEP 2.5: iOS – Disable system foreground alerts/sounds.
     // We handle notifications manually in onMessage to prevent duplicates
@@ -73,9 +76,9 @@ class PushNotificationService {
 
     // iOS: request alert, badge, sound so local notifications can be shown
     const iosInit = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
     );
 
     const notifications.InitializationSettings initSettings =
@@ -111,27 +114,6 @@ class PushNotificationService {
       },
     );
     print("✅ Local notifications initialized");
-
-    // iOS: ensure local notification permission is requested (needed to show banners/sound)
-    if (Platform.isIOS) {
-      final iosPlugin =
-          _localNotificationsPlugin.resolvePlatformSpecificImplementation<
-              notifications.IOSFlutterLocalNotificationsPlugin>();
-      if (iosPlugin != null) {
-        final granted = await iosPlugin.requestPermissions(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
-        print(
-            "🍎 iOS local notification permission requested: ${granted == true ? 'granted' : 'not granted'}");
-      }
-    }
-
-    // If Android notification permission was permanently denied, prompt user to open Settings
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showOpenSettingsPromptIfNeeded();
-    });
 
     // If app was opened by tapping OrderAlertService notification, navigate to task screen.
     // Also listen for native 'orderAlertTapped' calls so taps are handled even when
@@ -280,20 +262,28 @@ class PushNotificationService {
       _handleNavigationFromData(Map<String, dynamic>.from(message.data));
     });
 
-    // STEP 6: Terminated state handler (app launched from notification)
-    RemoteMessage? initialMessage =
-        await FirebaseMessaging.instance.getInitialMessage();
-    if (initialMessage != null) {
+    // Do not await getInitialMessage here. On iOS that call can sit on the
+    // platform channel until a frame exists, and main() waits for this method
+    // before runApp, so the launch screen stays white.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _captureInitialMessage();
+    });
+  }
+
+  static Future<void> _captureInitialMessage() async {
+    try {
+      final RemoteMessage? initialMessage =
+          await FirebaseMessaging.instance.getInitialMessage().timeout(
+                const Duration(seconds: 3),
+                onTimeout: () => null,
+              );
+      if (initialMessage == null) return;
       print("🚀 App launched from terminated state via notification");
       print("📱 Initial message data: ${initialMessage.data}");
-      // Removed: AlarmService.stopAllAlarms() - sound should persist until Accept
-
-      // Note: We don't play sound or vibration here because this is a tap event,
-      // not a notification arrival. Sound and vibration should only happen on arrival.
-
-      // Store the initial message data and use same retry logic as background tap
       _pendingNotificationData = initialMessage.data;
       _schedulePendingNotificationProcessing();
+    } catch (e) {
+      print("⚠️ getInitialMessage skipped: $e");
     }
   }
 
@@ -598,10 +588,102 @@ class PushNotificationService {
     }
   }
 
-  /// Request notification permissions
-  static Future<void> _requestPermissions() async {
-    // iOS & Android 13+ (API 33+)
-    NotificationSettings settings = await _firebaseMessaging.requestPermission(
+  static Future<void> _logNotificationPermissionStatus() async {
+    final status = await getNotificationAuthorizationStatus();
+    print("🔐 FCM Notification permission status: $status");
+  }
+
+  static Future<bool> isNotificationPermissionGranted() async {
+    if (Platform.isAndroid) {
+      final android = _localNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              notifications.AndroidFlutterLocalNotificationsPlugin>();
+      return await android?.areNotificationsEnabled() ?? false;
+    }
+    final settings = await FirebaseMessaging.instance.getNotificationSettings();
+    final status = settings.authorizationStatus;
+    return status == AuthorizationStatus.authorized ||
+        status == AuthorizationStatus.provisional;
+  }
+
+  static Future<AuthorizationStatus> getNotificationAuthorizationStatus() async {
+    if (Platform.isAndroid) {
+      if (await isNotificationPermissionGranted()) {
+        return AuthorizationStatus.authorized;
+      }
+      final perm = await Permission.notification.status;
+      if (perm.isPermanentlyDenied ||
+          perm.isRestricted ||
+          LocalStorageService.getNotificationOsDeniedAfterModal() ||
+          perm.isDenied) {
+        return AuthorizationStatus.denied;
+      }
+      return AuthorizationStatus.notDetermined;
+    }
+    final settings = await FirebaseMessaging.instance.getNotificationSettings();
+    return settings.authorizationStatus;
+  }
+
+  static Future<void> refreshNotificationPermissionState() async {
+    final status = await getNotificationAuthorizationStatus();
+    final granted = status == AuthorizationStatus.authorized ||
+        status == AuthorizationStatus.provisional;
+    _notificationStatus = status;
+    _notificationGranted = granted;
+    if (granted) {
+      await LocalStorageService.clearNotificationPermissionPromptState();
+    }
+  }
+
+  static bool shouldRequestOsPromptAfterModalAllow() {
+    if (_notificationGranted) return false;
+    if (LocalStorageService.getNotificationOsDeniedAfterModal()) return false;
+    if (Platform.isAndroid) return true;
+    return _notificationStatus == AuthorizationStatus.notDetermined;
+  }
+
+  static bool shouldOpenSettingsAfterModalAllow() {
+    if (_notificationGranted) return false;
+    if (shouldRequestOsPromptAfterModalAllow()) return false;
+    return LocalStorageService.getNotificationOsDeniedAfterModal() ||
+        _notificationStatus == AuthorizationStatus.denied;
+  }
+
+  /// Settings row and the bell: already on → snackbar. First time → system
+  /// dialog. Already denied → app notification settings.
+  static Future<void> handleNotificationEnableTap(BuildContext context) async {
+    final status = await getNotificationAuthorizationStatus();
+    _notificationStatus = status;
+    _notificationGranted = status == AuthorizationStatus.authorized ||
+        status == AuthorizationStatus.provisional;
+
+    if (_notificationGranted) {
+      await LocalStorageService.clearNotificationPermissionPromptState();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Notifications are already enabled'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+      return;
+    }
+
+    if (shouldRequestOsPromptAfterModalAllow()) {
+      final granted = await requestNotificationPermission();
+      if (!granted) {
+        await LocalStorageService.setNotificationOsDeniedAfterModal(true);
+      }
+      return;
+    }
+
+    await NotificationSettingsLauncher.open();
+  }
+
+  /// Request notification permissions. Called only after the in-app Allow tap.
+  static Future<bool> requestNotificationPermission() async {
+    await _firebaseMessaging.requestPermission(
       alert: true,
       announcement: false,
       badge: true,
@@ -610,60 +692,24 @@ class PushNotificationService {
       provisional: false,
       sound: true,
     );
-
-    print(
-        "🔐 FCM Notification permission status: ${settings.authorizationStatus}");
-
-    // Android 13+ runtime permission check
-    if (Platform.isAndroid &&
-        (await Permission.notification.isDenied ||
-            await Permission.notification.isPermanentlyDenied)) {
-      final status = await Permission.notification.request();
-      print("🔐 Android runtime notification permission status: $status");
-
-      if (status == PermissionStatus.permanentlyDenied) {
-        _androidNotificationPermanentlyDenied = true;
-        print("⚠️ User did not grant Android runtime notification permission.");
-      } else if (status != PermissionStatus.granted) {
-        print("⚠️ User did not grant Android runtime notification permission.");
-      }
+    if (Platform.isAndroid) {
+      final android = _localNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              notifications.AndroidFlutterLocalNotificationsPlugin>();
+      await android?.requestNotificationsPermission();
     }
-  }
-
-  /// Shows a dialog prompting the user to open app settings when Android notification permission is permanently denied.
-  static void _showOpenSettingsPromptIfNeeded() {
-    if (!Platform.isAndroid || !_androidNotificationPermanentlyDenied) return;
-
-    final context = _navigatorKey?.currentContext;
-    if (context == null || !context.mounted) return;
-
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Notifications disabled'),
-          content: const Text(
-            'Notifications are turned off for this app. To receive task alerts and reminders, please enable notifications in Settings.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Not now'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                openAppSettings();
-              },
-              child: const Text('Open Settings'),
-            ),
-          ],
-        );
-      },
-    );
-    // Only show once per app launch
-    _androidNotificationPermanentlyDenied = false;
+    if (Platform.isIOS) {
+      final ios = _localNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              notifications.IOSFlutterLocalNotificationsPlugin>();
+      await ios?.requestPermissions(alert: true, badge: true, sound: true);
+    }
+    final granted = await isNotificationPermissionGranted();
+    await refreshNotificationPermissionState();
+    if (!granted) {
+      await LocalStorageService.setNotificationOsDeniedAfterModal(true);
+    }
+    return granted;
   }
 
   // Note: we no longer show our own foreground notification here.

@@ -10,7 +10,6 @@ import 'package:guestezee_staffs_app/Screens/login_page.dart';
 import 'package:guestezee_staffs_app/Screens/settings_page.dart'
     show SettingsPage;
 import 'package:guestezee_staffs_app/Services/local_storage_service.dart';
-import 'package:guestezee_staffs_app/Services/notification_settings_service.dart';
 import 'package:guestezee_staffs_app/Services/push_notification_service.dart';
 import 'package:guestezee_staffs_app/Services/staff_service.dart';
 import 'package:hive/hive.dart';
@@ -143,37 +142,8 @@ Widget appBarContainer(
 
   Future<void> handleNotificationButtonTap() async {
     try {
-      bool areNotificationsEnabled =
-          await NotificationSettingsService.areNotificationsEnabled();
-
-      if (areNotificationsEnabled) {
-        // Show snackbar if notifications are already enabled
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  Icon(Icons.notifications_active, color: Colors.white),
-                  SizedBox(width: 8),
-                  Text('Notifications are already enabled'),
-                ],
-              ),
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 3),
-            ),
-          );
-        }
-      } else {
-        // Navigate to settings page for notification settings
-        if (context.mounted) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const SettingsPage(),
-            ),
-          );
-        }
-      }
+      if (!context.mounted) return;
+      await PushNotificationService.handleNotificationEnableTap(context);
     } catch (e) {
       print('❌ Error handling notification button: $e');
       if (context.mounted) {
